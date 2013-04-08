@@ -1,4 +1,0 @@
------ INSTALLER DRUPAL SOUS WAMPSERVER ----
-http://www.expert-web.org/infos/cms/drupal/Installer-Drupal-en-local-sur-wampserver
-
-
