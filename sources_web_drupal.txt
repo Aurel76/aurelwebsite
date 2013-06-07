@@ -1,4 +1,7 @@
 ----- INSTALLER DRUPAL SOUS WAMPSERVER ----
 http://www.expert-web.org/infos/cms/drupal/Installer-Drupal-en-local-sur-wampserver
 
+----- INSTALLER DRUPAL AVEC HERBERGEUR GRATUIT ----
+http://wiki.gandi.net/fr/hosting/using-linux/tutorials/simple/drupal#navigation-lang-menu
+
 
