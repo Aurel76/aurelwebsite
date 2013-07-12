@@ -1,0 +1,4 @@
+name = form_contact
+description = Formulaire de contact du site aurelwebsite
+core = 7.x
+package = Custom
