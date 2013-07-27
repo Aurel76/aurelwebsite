@@ -1,0 +1,4 @@
+name = aurelwebsite
+description = Ajout javascript et jquery custom
+core = 7.x
+package = Custom

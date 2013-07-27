@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * Implementation of hook_preprocess_page
+ * @param  [array] $variables [Variables du module custom]
+ */
+function aurelwebsite_preprocess_html(&$variables) {
+    // load js file
+     $options = array(
+    	'group' => JS_THEME,
+     );
+    drupal_add_js(drupal_get_path('module', 'aurelwebsite') . '/js/aurelwebsite.js', $options);
+    drupal_add_library('system', 'drupal.ajax');
+    drupal_add_library('system', 'jquery.form');
+}
