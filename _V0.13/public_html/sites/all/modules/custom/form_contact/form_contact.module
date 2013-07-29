@@ -1,0 +1,169 @@
+<?php
+
+/**
+ * Implementation of the hook_menu
+ * @return array [Contient le formulaire de contact]
+ */
+function form_contact_menu() {
+  $items = array();
+
+  $items['contact'] = array( 
+    'title' => 'Me contacter', 
+    'description' => 'Formulaire de contact du site aurelwebsite.',
+    'page callback' => 'drupal_get_form', 
+    'page arguments' => array('form_contact_form'), 
+    'access callback' => TRUE
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implementation of the contact form
+ * @return array [Structure du formulaire]
+ */
+function form_contact_form() {
+
+  $form['text_intro'] = array(
+    '#markup' => "<center><h2>Me Contacter</h2>
+                 <br><p>Tu souhaites m'envoyer un message pour faire des remarques sur mon site, me dire ce qui est bien (et ce qui ne l'est pas <img src=\"/pictures/emoticons/emoticon_tongue.png\" > ),me poser des questions, me proposer de nouveaux jeux (nouvelles radios/musiques), m'embêter avec des mails, ... alors clique sur le lien ou remplis le formulaire ci-dessous <img src=\"/pictures/emoticons/emoticon_wink.png\" ></center></p><br>
+                <p><h4>ENVOYER UN MESSAGE PAR MAIL</h4><a href=\"mailto:lehavrai76@hotmail.fr\" title=\"Envoyer via votre boite email\">Envoyer un message à @urel$</a></p><br>
+                <p><h4>ENVOYER UN MESSAGE PAR FORMULAIRE</h4></p>"
+  );
+  $form['pseudo'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Pseudo',
+    '#required' => TRUE,
+    '#size' => '40',
+    '#attributes' =>array('placeholder' => t('Saisis ton pseudo'))
+  );
+  $form['email'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Adresse mail',
+    '#size' => '40',
+    '#required' => TRUE,
+    '#attributes' =>array('placeholder' => t('Saisis ton adresse mail'))
+  );
+   $form['website'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Site internet (si tu en as un)',
+    '#size' => '40',
+    '#attributes' =>array('placeholder' => t('Saisis ton site internet'))
+  );
+  /* A finir tout a la fin */
+  $form['commentaire'] = array(
+    /*'#type' => 'text_format',
+    '#base_type' => 'textarea',
+    '#format' => 'filtered_html',*/
+    '#type' => 'textarea',
+    '#title' => 'Commentaire',
+    '#required' => TRUE,
+    '#attributes' =>array('placeholder' => t('Saisis ton commentaire')),
+    '#wysiwyg' => TRUE
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Envoyer le commentaire'),
+  );
+
+  return $form;
+}
+
+/**
+ * Implementation of the validate contact form
+ * @param  [array] $form       [Le formulaire de contact]
+ * @param  [array] $form_state [Etat du formulaire de contact]
+ * @return [string]            [Message de validation]
+ */
+function form_contact_form_validate($form, &$form_state) {
+  $valid_email = $form_state['values']['email'];
+  $valid_pseudo = $form_state['values']['pseudo'];
+  $valid_commentaire = $form_state['values']['commentaire'];
+  if (!valid_email_address($valid_email)) {
+  form_set_error('email', 'Désolé, ton adresse mail \'' . $valid_email . '\'  n\'est pas valide. Saisis une adresse correcte.');
+  }
+  if ($valid_pseudo == "") {
+  form_set_error('pseudo', 'Désolé, ton pseudo ne peut pas être vide (n\'est pas valide). Saisis un pseudo correct.');
+  }
+  if ($valid_commentaire == "") {
+  form_set_error('commentaire', 'Désolé, ton commentaire ne peut pas être vide (n\'est pas valide). Saisis un commentaire correct.');
+  }
+}
+
+/**
+ * Implementation of the mail contact form
+ * @param  [string] $key     [Identifiant du mail]
+ * @param  [array] $message [Elements du message]
+ * @param  [array] $params  [Parametres du mail]
+ * @return [array]         [Parametres du mail]
+ */
+function form_contact_mail($key, &$message, $params) {
+  $headers = array(
+    'MIME-Version' => '1.0',
+    'Content-Type' => 'text/html; charset=UTF-8;',
+    'Content-Transfer-Encoding' => '8Bit',
+    'X-Mailer' => 'Drupal'
+  );
+
+  foreach ($headers as $key => $value) {
+    $message['headers'][$key] = $value;
+  }
+
+  $message['subject'] = $params['subject'];
+  $message['body'] = $params['body'];
+}
+
+/**
+ * Implementation of the submit contact form
+ * @param  [array] $form       [Le formulaire de contact]
+ * @param  [array] $form_state [Etat du formulaire de contact]
+ * @return [string]             [Message de l'envoie]
+ */
+function form_contact_form_submit($form, &$form_state) {
+
+    // configuration pour l'envoi du mail
+    $my_module = 'form_contact';
+    $my_mail_token = 'bar';
+
+    // recuperation des données
+    $valid_email = $form_state['values']['email'];
+    $valid_pseudo = $form_state['values']['pseudo'];
+    $valid_website = $form_state['values']['website'];
+    $valid_commentaire = $form_state['values']['commentaire'];
+
+    // formatage du mail
+    $from = $valid_email;
+    $to = 'lehavrai76@hotmail.fr';
+    $subject = "[@urelwebsite] Nouveau message de la part de '".$valid_pseudo."'";
+    $body = "Salut Bogoss,<br><br>tu viens de recevoir un nouveau message de la part de l'internaute '".$valid_pseudo."'.<br/>";
+    if($valid_website != "") {
+      $body .= "Cet utilisateur possède un site internet : ".$valid_website."<br/>";
+    } else {
+      $body .= "Cet utilisateur n'a pas indiqué de site internet.<br/>";
+    }
+    $body .= "Voici son commentaire : <br/>\"". $valid_commentaire."\"<br/><br/>Tu peux lui répondre à son adresse ou ne rien faire.<br/>Je te laisse maintenant Bogoss d'@urel$76, je te dis à bientôt.<br/><br/>Ton site internet @urelwebsite.";
+
+    $message = array(
+    'id' => $my_module . '_' . $my_mail_token,
+    'to' => 'lehavrai76@hotmail.fr',
+    'subject' => $subject,
+    'body' => $body,
+    'headers' => array(
+      'From' => $from, 
+      'Sender' => $from, 
+      'Return-Path' => $from,
+      'Content-Type' => 'text/html; charset=UTF-8; format=flowed'
+    ),
+  );
+
+  // envoi et verification
+  $system = drupal_mail_system($my_module, $my_mail_token);
+  if ($system->mail($message)) {
+    drupal_set_message('Merci pour ton commentaire, l\'administrateur <i>@urel$76</i> le lira prochainement.');   
+  }
+  else {
+    drupal_set_message('Erreur lors de l\'envoi. Réessaie plus tard.');
+  }
+
+}
