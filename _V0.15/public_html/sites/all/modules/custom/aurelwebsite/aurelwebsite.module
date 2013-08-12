@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * Implementation of hook_preprocess_page
+ * @param  [array] $variables [Variables du module custom]
+ */
+function aurelwebsite_preprocess_html(&$variables) {
+    // load js file
+     $options = array(
+    	'group' => JS_THEME,
+     );
+    drupal_add_js(drupal_get_path('module', 'aurelwebsite') . '/js/aurelwebsite.js', $options);
+    drupal_add_library('system', 'drupal.ajax');
+    drupal_add_library('system', 'jquery.form');
+}
+
+/**
+ * Custom module for count games access
+ * @return array
+ */
+function aurelwebsite_block_info() {
+  $blocks = array();
+  
+  $blocks['count_jeux'] = array(
+    'info' => t('Jeux favoris'),
+  );
+ 
+  return $blocks;
+}
+
+/**
+ * Content of the custom block "Jeux favoris"
+ * @param string $delta
+ * @return array
+ */
+function aurelwebsite_block_view($delta = '') {
+    $block = array();
+    
+    switch($delta) {
+        case 'count_jeux' :
+            $block['subject'] = NULL;
+            $block['content'] = views_embed_view('jeux_favoris','favoris');
+            break;
+    }
+    
+    return $block;
+}
